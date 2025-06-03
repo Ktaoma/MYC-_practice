@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 using namespace std;
-
+// Day 1 Problem: Find the Longest Common Substring (LCS) Between Two DNA Sequences
 void KMER_FINDER(string seqA, string seqB);
 	
 int main() {
