@@ -1,6 +1,6 @@
 #include <iostream>  
 #include <string>
-#include <unordered_map>
+#include <map>
 using namespace std;
 
 //Goal: Implement a basic version of the Smith-Waterman algorithm to find the best local alignment between two DNA sequences.
@@ -21,13 +21,14 @@ int score (vector<vector<int>> H, int match, int i, int j, string type_ = "score
 
 	} else{
 		
+	
 		if(diag > max(top,left)){
 			return 1;
 		} else if (left > max(top,diag)){
 			return -1;
 		} else if (top > max(left,diag)) {
 			return -2;
-		} else if (0 == max(left,max(diag,top))){
+		} else if (0 <= max(left,max(diag,top))){
 			return 99;
 		} else {
 			return 0;
@@ -81,14 +82,6 @@ int main(){
 	}
 	
 	// 3. track back
-	/*
-	0 -2 -4 -6 -8 -10 -12 -14 -16 -18 -20 -22 -24
-	-2 2 0 0 0 0 0 0 0 0 0 0 0
-	-4 0 4 0 0 0 1 0 1 0 0 1 0
-	-6 0 0 4 0 0 1 0 0 4 0 0 4
-	-8 0 0 0 4 0 0 4 0 0 4 0 0		
-	*/
-
 	//3.1 find maximum value
 	int qs = query_.size();
 	int rs = ref_.size();
@@ -115,7 +108,7 @@ int main(){
 	}
 	
 	// 3.2 track
-	unordered_map<int,int> path;
+	map<int,int> path;
 	int n = max_idx.at(0);
 	int end_pos_row = rs-1;
 	int end_pos_col = n;
@@ -129,109 +122,71 @@ int main(){
 	cout << end_pos_row << endl;
 	cout << end_pos_col << endl;
 	cout << "->>>>>" << mat[end_pos_row][end_pos_col] << endl;
-	
 	path[end_pos_row] = end_pos_col;
 	
-	while(end_ <= 90){
+	--end_pos_row;
+	--end_pos_col;
+	
+	while(end_ < 1){
 		
 		if (pos_ == 1){
+			
 			//diag
+			if(end_pos_row == 0 && end_pos_col == 0){
+				break;
+			}
 			
 			cout << "diag" << endl;
 			cout << end_pos_row << endl;
-			cout <<end_pos_col<< endl;
+			cout << end_pos_col<< endl;
+						
+			path[end_pos_row] = end_pos_col;
+			
+			int tb = (ref_.at(end_pos_row) == query_.at(end_pos_col)) ? 2 : -1;
+			int pos_=score(mat,tb,end_pos_row,end_pos_col,"trackback");
+			
+			if(pos_ == 99){
+				break;
+			}
+			
+			cout << pos_<<endl;
+			cout << "->>>>>" << mat[end_pos_row][end_pos_col] << endl; 
 			
 			--end_pos_row;
 			--end_pos_col;
-			path[end_pos_row] = end_pos_col;
 			
-			if(end_pos_row == 0 && end_pos_col == 0){
-				end_=99;
-			}
-			
-			int pos_=score(mat,mat[end_pos_row][end_pos_col],end_pos_row,end_pos_col,"trackback");
-			cout << pos_<<endl;
-			cout << "->>>>>" << mat[end_pos_row][end_pos_col] << endl;
-			
-			
-			if(pos_ == 99){
-				end_ = 99;
-			} 
-			
-			
-		} else if (pos_ == -1){
-			//left
-			cout << "left" << endl;			
-			cout << end_pos_row << endl;
-			cout <<end_pos_col<< endl;
-			
-			
-			int pos_=score(mat,mat[end_pos_row][end_pos_col],end_pos_row,end_pos_col,"trackback");
-			cout << pos_<<endl;
-			cout << "->>>>>" << mat[end_pos_row][end_pos_col] << endl;
-			
-			//--end_pos_row;
-			--end_pos_col;
-			path[end_pos_row] = end_pos_col;
-			
-			if(end_pos_row == 0 && end_pos_col == 0){
-				end_=99;
-			}
-			
-			if(pos_ == 99){
-				end_ = 99;
-			} 
 			
 		} else {
-			//top
-			
-			cout << "top" << endl;
-			cout << end_pos_row << endl;
-			cout <<end_pos_col<< endl;
-			
-			
-			int pos_=score(mat,mat[end_pos_row][end_pos_col],end_pos_row,end_pos_col,"trackback");
-			cout << pos_<<endl;
-			cout << "->>>>>" << mat[end_pos_row][end_pos_col] << endl;
-			
-			--end_pos_row;
-			path[end_pos_row] = end_pos_col;
-			//--end_pos_col;
-			
-			if(end_pos_row == 0 && end_pos_col == 0){
-				end_=99;
-			}
-			
-			if(pos_ == 99){
-				end_ = 99;
-			} 
-		}
-		
-		
-		
-		
+			cout << "placeholder for mismatch" << endl;
+		} 
 	}
 	
 	
-	for(auto l: path){
-		cout << l.first << " is: " << l.second << "\n";
+	// 3.4 Visualization
+	vector<int> keys;
+	vector<int> vals;
+	for (auto i : path){
+		keys.push_back(i.first);
+		vals.push_back(i.second);
 	}
 	
-		/*
-		
-		
-		
-		// #####
-		
-		
-		cout << end_ << "/" << max_idx.size()<< endl;
-		++end_;
+	for(auto i: keys){
+		cout << ref_1.at(i-1) << " ";
+	}
 	
-		
-	// #####	
-	*/
-		
-		
+	cout << endl;
+	
+	for(auto i: keys){
+		cout << "*" << " ";
+	}
+	
+	cout << endl;
+	
+	for(auto i: vals){
+		cout << query_1.at(i-1) << " ";
+	}
+	
+			
 }
 
 
